@@ -28,27 +28,21 @@ jobs:
           ${{ secrets.DOCKER_USERNAME }}/my-app:${{ github.sha }}
           ${{ secrets.DOCKER_USERNAME }}/my-app:latest
 
-    # 2. Update Kubernetes Manifests with the new Image Tag
+    - name: List files for debugging
+      run: |
+        echo "=== Current Working Directory ==="
+        pwd
+        echo "=== Top Level Files ==="
+        ls -la
+        echo "=== Searching for deployment.yaml ==="
+        find . -name "deployment.yaml"
+
+    # 2. Update Kubernetes Manifests locally on the runner
     - name: Update Image Tag in Manifest
       run: |
-        sed -i 's|DOCKER_IMAGE_PLACEHOLDER|${{ secrets.DOCKER_USERNAME }}/my-app:${{ github.sha }}|g' ~/k8s-deployments/deployment.yaml
+        sed -i 's|DOCKER_IMAGE_PLACEHOLDER|${{ secrets.DOCKER_USERNAME }}/my-app:${{ github.sha }}|g' k8s-deployments/deployment.yaml
 
-    # 3. Deploy to K3s over SSH / Kubeconfig
-    - name: Deploy to K3s Cluster
-      uses: appleboy/ssh-action@v1.0.3
-      with:
-        host: ${{ secrets.EC2_HOST }}
-        username: ubuntu
-        key: ${{ secrets.EC2_SSH_KEY }}
-        script: |
-          # Create deployment files dynamically or pull repository on server
-          mkdir -p ~/k8s-deployments
-          cat << 'EOF' > ~/k8s-deployments/deployment.yaml
-          ${{ steps.update_manifest.outputs.manifest }}
-          EOF
-          
-          
-    # Streamlined Secure Deployment using kubectl directly inside GitHub Actions
+    # 3. Setup Kubectl and apply directly from GitHub runner
     - name: Setup Kubectl
       uses: azure/setup-kubectl@v3
       with:
