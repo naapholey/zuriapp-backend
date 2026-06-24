@@ -40,7 +40,7 @@ jobs:
     # 2. Update Kubernetes Manifests locally on the runner
     - name: Update Image Tag in Manifest
       run: |
-        sed -i 's|DOCKER_IMAGE_PLACEHOLDER|${{ secrets.DOCKER_USERNAME }}/my-app:${{ github.sha }}|g' k8s-deployments/deployment.yaml
+        sed -i 's|DOCKER_IMAGE_PLACEHOLDER|${{ secrets.DOCKER_USERNAME }}/my-app:${{ github.sha }}|g' k8s/deployment.yaml
 
     # 3. Setup Kubectl and apply directly from GitHub runner
     - name: Setup Kubectl
@@ -56,6 +56,6 @@ jobs:
 
     - name: Apply Manifests to K3s
       run: |
-        kubectl apply -f k8s-deployments/deployment.yaml
-        kubectl apply -f k8s-deployments/ingress.yaml
+        kubectl apply -f k8s/deployment.yaml
+        kubectl apply -f k8s/ingress.yaml
         kubectl rollout status deployment/my-app-deployment
