@@ -31,7 +31,7 @@ jobs:
     # 2. Update Kubernetes Manifests with the new Image Tag
     - name: Update Image Tag in Manifest
       run: |
-        sed -i 's|DOCKER_IMAGE_PLACEHOLDER|${{ secrets.DOCKER_USERNAME }}/my-app:${{ github.sha }}|g' k8s-deployments/deployment.yaml
+        sed -i 's|DOCKER_IMAGE_PLACEHOLDER|${{ secrets.DOCKER_USERNAME }}/my-app:${{ github.sha }}|g' ~/k8s/deployment.yaml
 
     # 3. Deploy to K3s over SSH / Kubeconfig
     - name: Deploy to K3s Cluster
